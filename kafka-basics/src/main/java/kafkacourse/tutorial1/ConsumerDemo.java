@@ -1,4 +1,4 @@
-package com.kafkacourse.tutorial1;
+package kafkacourse.tutorial1;
 
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -12,7 +12,8 @@ import java.time.Duration;
 import java.util.Collections;
 import java.util.Properties;
 
-public class ConsumerDemoGroups {
+public class ConsumerDemo {
+
     private static Logger logger = LoggerFactory.getLogger(ConsumerDemo.class);
 
     public static void main(String[] args) {
