@@ -1,4 +1,4 @@
-package com.kafkacourse.tutorial2;
+package kafkacourse.tutorial2;
 
 import com.google.common.collect.Lists;
 import com.twitter.hbc.ClientBuilder;
@@ -11,7 +11,6 @@ import com.twitter.hbc.core.processor.StringDelimitedProcessor;
 import com.twitter.hbc.httpclient.auth.Authentication;
 import com.twitter.hbc.httpclient.auth.OAuth1;
 import org.apache.kafka.clients.producer.*;
-import org.apache.kafka.common.protocol.types.Field;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,7 +30,7 @@ public class TwitterProducer {
     private static final String token = "132376011-O1l0qPjXuYC1OMje5znE6szoWPtntpjuhYBXFeAy";
     private static final String secret = "QsdFYglkHoRpVogIIn4TKyiSmbrio35pOQRhge8WFFDKa";
     // Optional: set up some followings and track terms
-    private static final List<String> terms = Lists.newArrayList("Andrade");
+    private static final List<String> terms = Lists.newArrayList("Andrade", "Lacalle", "Rada", "Coronavirus");
 
     public TwitterProducer() {
     }
@@ -102,7 +101,11 @@ public class TwitterProducer {
         properties.setProperty(ProducerConfig.MAX_IN_FLIGHT_REQUESTS_PER_CONNECTION, "5");
 
         //compresion
-        properties.setProperty(ProducerConfig.COMPRESSION_TYPE_CONFIG, "zstd");
+        properties.setProperty(ProducerConfig.COMPRESSION_TYPE_CONFIG, "snappy");
+
+        //high throughput producer at the expense of a bit of latency and CPU usage
+        properties.setProperty(ProducerConfig.LINGER_MS_CONFIG, "20");
+        properties.setProperty(ProducerConfig.BATCH_SIZE_CONFIG, Integer.toString(32*1024));
 
         //create the producer
         KafkaProducer<String, String> producer = new KafkaProducer<String, String>(properties);
