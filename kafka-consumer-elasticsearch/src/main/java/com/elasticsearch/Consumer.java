@@ -1,7 +1,5 @@
 package com.elasticsearch;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.JsonParser;
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
@@ -13,12 +11,10 @@ import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
-import org.apache.kafka.common.protocol.types.Field;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.index.IndexRequest;
-import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestClientBuilder;
@@ -77,7 +73,6 @@ public class Consumer {
     }
 
 
-
     public static void main(String[] args) throws IOException {
         Logger logger = LoggerFactory.getLogger(Consumer.class.getName());
         RestHighLevelClient client = createClient();
@@ -96,20 +91,20 @@ public class Consumer {
                 //kafka generic id
                 //String id = record.topic()+"_"+ record.partition()+"_"+record.offset();
 
-                try{
+                try {
                     //twitter feed specific id
-                    String id = extractIdFromTweet((String)record.value());
+                    String id = extractIdFromTweet((String) record.value());
 
                     // where we insert data into elastic search
                     IndexRequest indexRequest = new IndexRequest("twitter", "tweets", id/*idempotent*/)
-                            .source((String)record.value(), XContentType.JSON);
+                            .source((String) record.value(), XContentType.JSON);
 
                     bulkRequest.add(indexRequest); // we add to our bulk request (takes no time)
-                }catch(NullPointerException e){
+                } catch (NullPointerException e) {
                     logger.warn("Skippping bad data");
                 }
 
-                if(records.count() > 0){
+                if (records.count() > 0) {
                     BulkResponse bulkResponse = client.bulk(bulkRequest, RequestOptions.DEFAULT);
                     try {
                         Thread.sleep(1000);
@@ -125,6 +120,7 @@ public class Consumer {
     }
 
     private static JsonParser jsonParser = new JsonParser();
+
     private static String extractIdFromTweet(String json) {
         return jsonParser.parse(json).getAsJsonObject().get("id_str").getAsString();
     }
